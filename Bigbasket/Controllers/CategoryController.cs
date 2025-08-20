@@ -23,9 +23,20 @@ namespace Bigbasket_Ecommerce.Controllers
         [Route("AddCategory")]
         public async Task<ActionResult> AddCategory(Category category)
         {
+            try {
+                await _categoryRepository.AddCategory(category);
+                return Ok("save successful");
 
-            await _categoryRepository.AddCategory(category);
-            return Ok("save sussessful");
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500,new ApiResponse<string>{
+                    message=$"Category Item do not save database: {ex.Message} ",
+                    status=false
+
+                } );
+            }
+          
         }
 
         [HttpGet]
@@ -44,13 +55,26 @@ namespace Bigbasket_Ecommerce.Controllers
         [Route("GetbycategoryId")]
         public async Task<ActionResult<CategoreDto?> > GetbycategoryId(int id)
         {
-            var categoryItem= await _categoryRepository.GetById(id);
-            var categoryDto = new CategoreDto
+            try
             {
-                CategoryId=categoryItem.CategoryId,
-                CategoryName = categoryItem.CategoryName
-            };
-            return categoryDto;
+                var categoryItem = await _categoryRepository.GetById(id);
+                var categoryDto = new CategoreDto
+                {
+                    CategoryId = categoryItem.CategoryId,
+                    CategoryName = categoryItem.CategoryName
+                };
+                return categoryDto;
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(400, new ApiResponse<string>
+                {
+                    message=$"internal server error:{ex.Message} ",
+                    status=false
+                });
+
+            }
+           
         }
 
 

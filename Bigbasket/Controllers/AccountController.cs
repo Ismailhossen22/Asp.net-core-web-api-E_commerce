@@ -28,116 +28,205 @@ namespace Bigbasket_Ecommerce.Controllers
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterUserDto users)
+
         {
-            var ExistUser =  _Context.User.FirstOrDefault(user => user.Email == users.Email);
 
-            if (ExistUser !=null )
+            try
             {
-                return NotFound(new ApiResponse<UserDto> { message = "User Already Exist",status=false,Data=null });
+                var ExistUser = _Context.User.FirstOrDefault(user => user.Email == users.Email);
+
+                if (ExistUser != null)
+                {
+                    return NotFound(new ApiResponse<string> { message = "User Already Exist", status = false });
+                }
+                string HashPassword = BCrypt.Net.BCrypt.HashPassword(users.password);
+
+                var user = new User
+                {
+                    Name = users.Name,
+                    Email = users.Email,
+                    Hashpassword = HashPassword,
+                    password = users.password
+
+
+                };
+
+
+                _Context.User.Add(user);
+                _Context.SaveChanges();
+                return Ok(new ApiResponse<string> { message = "User Create Successful", status = true });
             }
-            var user = new User
+            catch(Exception ex)
             {
-                Name = users.Name,
-                Email = users.Email,
-                password = users.password
 
+                return StatusCode(500, new ApiResponse<string>
+                {
 
-            };
+                    message=$"Internal Error :{ex.Message} ",
+                    status=false
 
+                });
+                
+            }
 
-            _Context.User.Add(user);
-            _Context.SaveChanges();
-            return Ok(new ApiResponse<UserDto> { message = "User Create Successful", status = true });
         }
         [HttpPost("Login")]
 
-        public async Task<IActionResult> Login([FromBody] loginDto users)
+        public async Task<IActionResult> Login([FromBody] loginDto logindtos)
         {
-            var user = await _Context.User.FirstOrDefaultAsync(res => res.Email == users.Email && res.password == users.Password);
 
-            if (user==null)
+            try
             {
-                return Ok(new ApiResponse<User> { message = "User  or password Invalid", status = false,Data=null });
+                var user = await _Context.User.FirstOrDefaultAsync(u => u.Email == logindtos.Email);
+
+                if (user == null)
+                {
+                    return Ok(new ApiResponse<loginDto> { message = "User  or password Invalid", status = false });
+                }
+                bool isValidPassword = BCrypt.Net.BCrypt.Verify(logindtos.Password, user.Hashpassword);
+                if (!isValidPassword)
+                {
+                    return Ok(new ApiResponse<loginDto> { message = "User  or password Invalid", status = false });
+                }
+
+                var userdto = new UserDto
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    Name = user.Name
+
+                };
+
+                var AccessToken = _tokenService.GenerateAccessToken(user);
+                var RefreshToken = _tokenService.GenerateRefreshToken(user.Id);
+
+                var tokenData = new LoginResponse
+                {
+                    AccessToken = AccessToken,
+                    RefreshToken = RefreshToken,
+                    User = userdto
+                };
+
+                return base.Ok(new ApiResponse<LoginResponse> { message = "Login Successful", status = true, Data = tokenData });
             }
-
-            var userdto = new UserDto
+            catch(Exception ex)
             {
-                Id = user.Id,
-                Email = user.Email,
-                Name = user.Name
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    message=$"Server Error :{ex.Message} ",
+                    status=false
+                } );
 
-            };
 
-            var AccessToken = _tokenService.GenerateAccessToken(user);
-            var RefreshToken = _tokenService.GenerateRefreshToken(user.Id);
-
-            var tokenData = new Models.LoginResponse
-            {
-                AccessToken = AccessToken,
-                RefreshToken = RefreshToken,
-                User = userdto
-            };
-
-            return base.Ok(new ApiResponse<Models.LoginResponse> { message = "Login Successful", status = true, Data = tokenData });
+            }
+                  
 
         }
+
+
         [HttpGet("GetAllUser")]
         public async Task<IActionResult> GetAllUser()
         {
-            var data = await _Context.User.ToListAsync();
-            if (data == null || !data.Any()) return NotFound(new ApiResponse<User> { message = "Get not user", status = false });
+            try
+            {
+                var data = await _Context.User.ToListAsync();
+                if (data == null || !data.Any()) return NotFound(new ApiResponse<string> { message = "Get not user", status = false });
 
 
 
-            return Ok(new ApiResponse<IEnumerable< User>> { message = "Get all user successful", status = true, Data=data });   
+                return Ok(new ApiResponse<IEnumerable<User>> { message = "Get all user successful", status = true, Data = data });
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    message=$"inernal problem{ex.Message} ",
+                    status=false
+
+                });
+            }
+            
         }
 
         [HttpPost("Refresh")]
-       
-        public async  Task<IActionResult> Refresh([FromBody] TokenModel model) 
+
+        public async Task<IActionResult> Refresh([FromBody] TokenModel model)
         {
-           
-           
-            var stored = await _Context.RefreshTokens.Include(res => res.user).FirstOrDefaultAsync(r => r.RefreshUserToken == model.RefreshToken);
-            if (stored == null || stored.IsRevoked || stored.Expires < DateTime.UtcNow) return Unauthorized();
-            
-            //stored.IsRevoked = true;
+            try {
+                var stored = await _Context.RefreshTokens.Include(res => res.user).FirstOrDefaultAsync(r => r.RefreshUserToken == model.RefreshToken);
+                if (stored == null || stored.IsRevoked || stored.Expires < DateTime.UtcNow)
+                    return Unauthorized(new ApiResponse<string> {message="Invalid or Expired Refresh token",status=false });
 
-            
-            var NewAccessToken = _tokenService.GenerateAccessToken(stored.user);
-            var NewRefreshToken = _tokenService.GenerateRefreshToken(stored.user.Id);
+                //stored.IsRevoked = true;
 
-            //stored.IsRevoked = true;
-            //_Context.SaveChangesAsync();
-           //  _tokenService.RevokeRefreshToken(model.RefreshToken);
 
-            var token = new LoginResponse
+                var NewAccessToken = _tokenService.GenerateAccessToken(stored.user);
+                var NewRefreshToken = _tokenService.GenerateRefreshToken(stored.user.Id);
+
+                //stored.IsRevoked = true;
+                //_Context.SaveChangesAsync();
+                //  _tokenService.RevokeRefreshToken(model.RefreshToken);
+
+                var token = new LoginResponse
+                {
+                    AccessToken = NewAccessToken,
+                    RefreshToken = NewRefreshToken,
+
+                };
+
+
+                return Ok(new ApiResponse<LoginResponse>
+                { message = "token create successful",
+                    status = true,
+                    Data = token
+                });
+
+
+            }
+            catch(Exception ex )
             {
-                AccessToken = NewAccessToken,
-                RefreshToken = NewRefreshToken,
-             
+                return StatusCode(500, new ApiResponse<string>
+                {
+                  message=$"Something went wrong{ex.Message} ",
+                  status=false
+                  
+                  
+                });
+            }
 
 
-
-            };
            
-
-            
-            return base.Ok(new ApiResponse<LoginResponse> { message = "token create successful", status = true, Data =token  });
-
+         
         }
 
         [HttpPost("Logout") ]
         public async Task<IActionResult> Logout([FromBody] TokenModel model)
         {
-            var stored = await _Context.RefreshTokens.SingleOrDefaultAsync(r => r.RefreshUserToken == model.RefreshToken);
-             if(stored != null)
+
+            try
             {
-                stored.IsRevoked = true;
-               // _tokenService.RevokeRefreshToken(model.RefreshToken);
-                await _Context.SaveChangesAsync();
+                var stored = await _Context.RefreshTokens.SingleOrDefaultAsync(r => r.RefreshUserToken == model.RefreshToken);
+                if (stored != null)
+                {
+                    stored.IsRevoked = true;
+                    // _tokenService.RevokeRefreshToken(model.RefreshToken);
+                    await _Context.SaveChangesAsync();
+                }
+                return Ok(new ApiResponse<TokenModel> { message = "Logout successfully", status = true });
             }
-            return Ok(new ApiResponse<TokenModel> { message = "Logout successfully",status=true });
+            catch(Exception ex)
+            {
+
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    message= $"Logout failed:{ex.Message} ",
+                    status=false
+
+                });
+            }
+            
+
+
         }
 
 

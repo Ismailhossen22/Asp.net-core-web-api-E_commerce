@@ -18,7 +18,7 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "users",
+        "Name": "logindtos",
         "Type": "Bigbasket_Ecommerce.Models.Dto.loginDto",
         "IsRequired": true
       }

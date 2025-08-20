@@ -298,3 +298,5 @@ D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\refint\Bigbasket_Ecommerce.dll
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\Bigbasket_Ecommerce.pdb
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\Bigbasket_Ecommerce.genruntimeconfig.cache
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\ref\Bigbasket_Ecommerce.dll
+D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\BCrypt.Net-Next.dll
+D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\Bigbasket_Ecommerce.sourcelink.json
