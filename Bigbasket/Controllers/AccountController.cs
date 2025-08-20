@@ -140,7 +140,7 @@ namespace Bigbasket_Ecommerce.Controllers
             {
                 return StatusCode(500, new ApiResponse<string>
                 {
-                    message=$"inernal problem{ex.Message} ",
+                    message=$"internal problem :{ex.Message} ",
                     status=false
 
                 });

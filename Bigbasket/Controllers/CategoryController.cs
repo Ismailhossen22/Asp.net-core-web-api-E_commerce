@@ -25,7 +25,9 @@ namespace Bigbasket_Ecommerce.Controllers
         {
             try {
                 await _categoryRepository.AddCategory(category);
-                return Ok("save successful");
+                return Ok(new {message="Category Product Save successful",status=true} );
+
+
 
             }
             catch(Exception ex)
@@ -42,13 +44,25 @@ namespace Bigbasket_Ecommerce.Controllers
         [HttpGet]
         [Route("GetAllCategory")]
        
-        public async Task<IEnumerable<Category?>> GetAllCategory()
+        public async Task<ActionResult<Category?>> GetAllCategory()
         {
-            var category = await _categoryRepository.GetAllCategoryAsync();
-           
-            
 
-            return category;
+            try
+            {
+                var category = await _categoryRepository.GetAllCategoryAsync();
+
+                return Ok (new ApiResponse<IEnumerable<Category>>{ message = "Get category successful",status=true,Data=category });
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message=$"Internal server error { ex.Message}",
+                    status=false
+
+                });
+            }
+         
         }
 
         [HttpGet]
@@ -58,16 +72,20 @@ namespace Bigbasket_Ecommerce.Controllers
             try
             {
                 var categoryItem = await _categoryRepository.GetById(id);
+                if (categoryItem ==null)
+                {
+                    return NotFound(new { message = "Category product not found", status = false });
+                }
                 var categoryDto = new CategoreDto
                 {
-                    CategoryId = categoryItem.CategoryId,
+                    CategoryId = categoryItem!.CategoryId,
                     CategoryName = categoryItem.CategoryName
                 };
-                return categoryDto;
+                return Ok(new { message = "Get Category successful", status = true, data = categoryDto });
             }
             catch(Exception ex)
             {
-                return StatusCode(400, new ApiResponse<string>
+                return StatusCode(500, new ApiResponse<string>
                 {
                     message=$"internal server error:{ex.Message} ",
                     status=false

@@ -183,26 +183,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Category"
-                  }
+                  "$ref": "#/components/schemas/Category"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Category"
-                  }
+                  "$ref": "#/components/schemas/Category"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Category"
-                  }
+                  "$ref": "#/components/schemas/Category"
                 }
               }
             }
@@ -292,7 +283,7 @@
         }
       }
     },
-    "/api/Product/GetProductById": {
+    "/api/Product/{id}": {
       "get": {
         "tags": [
           "Product"
@@ -300,7 +291,8 @@
         "parameters": [
           {
             "name": "id",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -329,9 +321,7 @@
             }
           }
         }
-      }
-    },
-    "/api/Product/{id}": {
+      },
       "put": {
         "tags": [
           "Product"
