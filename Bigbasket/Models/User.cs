@@ -6,17 +6,21 @@ namespace Bigbasket_Ecommerce.Models
     public class User
     {
 
-        public int Id { get; set; }
+        public int UserId { get; set; }
        
-        public string? Name { get; set; }
-        [Required]
+        public string Name { get; set; }
+       
         public string Email { get; set; }
-        [Required]
-        public string password { get; set; }
-        public string? Hashpassword { get; set; }
-        [NotMapped]
+       
+        public string Hashpassword { get; set; }
+        public string? OtpCode { get; set; }
+        public DateTime? OtpExpiry { get; set; }
+        public string? Token { get; set; }
+      
         public ICollection<RefreshToken>? RefreshTokens { get; set; }
+        public ICollection<UserRole>? UserRole { get; set; }
 
+        
 
     }
 }

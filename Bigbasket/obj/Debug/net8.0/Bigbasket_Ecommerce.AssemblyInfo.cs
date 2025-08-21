@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Bigbasket_Ecommerce")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1f058f6cc9d7ce8c13c4a7184f491c7b48e66121")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3a4bb795e934c03da14e18c0c0f82b60238652b1")]
 [assembly: System.Reflection.AssemblyProductAttribute("Bigbasket_Ecommerce")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Bigbasket_Ecommerce")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

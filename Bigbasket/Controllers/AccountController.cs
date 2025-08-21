@@ -15,16 +15,20 @@ namespace Bigbasket_Ecommerce.Controllers
     public class AccountController : ControllerBase
     {
 
-
-
         public readonly AppDbContext _Context;
         public readonly TokenService _tokenService;
+        public readonly IEmailService _EmailService;
 
-        public AccountController(AppDbContext context, TokenService tokenService)
+
+
+        public AccountController(AppDbContext context, TokenService tokenService, IEmailService emailService)
         {
             _Context = context;
             _tokenService = tokenService;
+            _EmailService = emailService;
         }
+
+
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterUserDto users)
@@ -43,10 +47,10 @@ namespace Bigbasket_Ecommerce.Controllers
 
                 var user = new User
                 {
+
                     Name = users.Name,
                     Email = users.Email,
-                    Hashpassword = HashPassword,
-                    password = users.password
+                    Hashpassword = HashPassword
 
 
                 };
@@ -56,22 +60,24 @@ namespace Bigbasket_Ecommerce.Controllers
                 _Context.SaveChanges();
                 return Ok(new ApiResponse<string> { message = "User Create Successful", status = true });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
                 return StatusCode(500, new ApiResponse<string>
                 {
 
-                    message=$"Internal Error :{ex.Message} ",
-                    status=false
+                    message = $"Internal Error :{ex.Message} ",
+                    status = false
 
                 });
-                
+
             }
 
         }
-        [HttpPost("Login")]
 
+
+
+        [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] loginDto logindtos)
         {
 
@@ -91,14 +97,14 @@ namespace Bigbasket_Ecommerce.Controllers
 
                 var userdto = new UserDto
                 {
-                    Id = user.Id,
+                    Id = user.UserId,
                     Email = user.Email,
                     Name = user.Name
 
                 };
 
                 var AccessToken = _tokenService.GenerateAccessToken(user);
-                var RefreshToken = _tokenService.GenerateRefreshToken(user.Id);
+                var RefreshToken = _tokenService.GenerateRefreshToken(user.UserId);
 
                 var tokenData = new LoginResponse
                 {
@@ -109,17 +115,17 @@ namespace Bigbasket_Ecommerce.Controllers
 
                 return base.Ok(new ApiResponse<LoginResponse> { message = "Login Successful", status = true, Data = tokenData });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, new ApiResponse<string>
                 {
-                    message=$"Server Error :{ex.Message} ",
-                    status=false
-                } );
+                    message = $"Server Error :{ex.Message} ",
+                    status = false
+                });
 
 
             }
-                  
+
 
         }
 
@@ -136,32 +142,33 @@ namespace Bigbasket_Ecommerce.Controllers
 
                 return Ok(new ApiResponse<IEnumerable<User>> { message = "Get all user successful", status = true, Data = data });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, new ApiResponse<string>
                 {
-                    message=$"internal problem :{ex.Message} ",
-                    status=false
+                    message = $"internal problem :{ex.Message} ",
+                    status = false
 
                 });
             }
-            
+
         }
 
-        [HttpPost("Refresh")]
 
+        [HttpPost("Refresh")]
         public async Task<IActionResult> Refresh([FromBody] TokenModel model)
         {
-            try {
-                var stored = await _Context.RefreshTokens.Include(res => res.user).FirstOrDefaultAsync(r => r.RefreshUserToken == model.RefreshToken);
+            try
+            {
+                var stored = await _Context.RefreshTokens.Include(res => res.User).FirstOrDefaultAsync(r => r.RefreshUserToken == model.RefreshToken);
                 if (stored == null || stored.IsRevoked || stored.Expires < DateTime.UtcNow)
-                    return Unauthorized(new ApiResponse<string> {message="Invalid or Expired Refresh token",status=false });
+                    return Unauthorized(new ApiResponse<string> { message = "Invalid or Expired Refresh token", status = false });
 
                 //stored.IsRevoked = true;
 
 
-                var NewAccessToken = _tokenService.GenerateAccessToken(stored.user);
-                var NewRefreshToken = _tokenService.GenerateRefreshToken(stored.user.Id);
+                var NewAccessToken = _tokenService.GenerateAccessToken(stored.User);
+                var NewRefreshToken = _tokenService.GenerateRefreshToken(stored.User.UserId);
 
                 //stored.IsRevoked = true;
                 //_Context.SaveChangesAsync();
@@ -176,30 +183,32 @@ namespace Bigbasket_Ecommerce.Controllers
 
 
                 return Ok(new ApiResponse<LoginResponse>
-                { message = "token create successful",
+                {
+                    message = "token create successful",
                     status = true,
                     Data = token
                 });
 
 
             }
-            catch(Exception ex )
+            catch (Exception ex)
             {
                 return StatusCode(500, new ApiResponse<string>
                 {
-                  message=$"Something went wrong{ex.Message} ",
-                  status=false
-                  
-                  
+                    message = $"Something went wrong{ex.Message} ",
+                    status = false
+
+
                 });
             }
 
 
-           
-         
+
+
         }
 
-        [HttpPost("Logout") ]
+
+        [HttpPost("Logout")]
         public async Task<IActionResult> Logout([FromBody] TokenModel model)
         {
 
@@ -214,22 +223,116 @@ namespace Bigbasket_Ecommerce.Controllers
                 }
                 return Ok(new ApiResponse<TokenModel> { message = "Logout successfully", status = true });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
                 return StatusCode(500, new ApiResponse<string>
                 {
-                    message= $"Logout failed:{ex.Message} ",
-                    status=false
+                    message = $"Logout failed:{ex.Message} ",
+                    status = false
 
                 });
             }
-            
+
+
+
+        }
+
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto model)
+        {
+            try
+            {
+                var user = await _Context.User.FirstOrDefaultAsync(u => u.Email == model.Email);
+                if (user == null)
+                {
+                    return BadRequest("User not found");
+                }
+
+                var otp = new Random().Next(100000, 999999).ToString();
+                user.OtpCode = otp;
+                user.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
+
+
+                await _Context.SaveChangesAsync();
+
+                await _EmailService.SendEmailAsync(user.Email, "Password Reset OTP", $"Your OTP Code is <b> {otp} </b>.It Will Expire in 5 minutes");
+
+
+
+                return Ok(new { message = "Otp Sent to your email", status = true });
+
+
+
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = $"server error : {ex.Message} ",
+                    status = false
+                });
+
+            }
+
+
+
+        }
+
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto model)
+        {
+            try
+            {   // user email check
+                var user = await _Context.User.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+                if (user == null)
+                {
+                    return BadRequest(new { message = "User not found", status = false });
+
+
+                }
+                //OTP check
+                if (user.OtpCode != model.OtpCode || user.OtpExpiry < DateTime.UtcNow)
+                {
+
+                    return BadRequest(new { message = "Invalid or expired OTP", status = false });
+                }
+                // hashPassword save
+                user.Hashpassword = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+                user.OtpCode = null;
+                user.OtpExpiry = null;
+                await _Context.SaveChangesAsync();
+
+                return Ok(new { message = "Password reset successfully", status = true });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    messeage = $"Internal Server problem={ex.Message} ",
+                    status = false
+
+                });
+
+            }
+
 
 
         }
 
 
 
+
+
+
+
+
+
     }
-}
+
+
+ }

@@ -8,6 +8,7 @@ D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Bigbasket_Ecommerce.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Bigbasket_Ecommerce.pdb
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Azure.Core.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Azure.Identity.dll
+D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\BCrypt.Net-Next.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Humanizer.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\System.Web.Mvc.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\System.Web.Razor.dll
@@ -281,6 +282,7 @@ D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\Bigbasket_Ecommerce.AssemblyInf
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\Bigbasket_Ecommerce.csproj.CoreCompileInputs.cache
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\Bigbasket_Ecommerce.MvcApplicationPartsAssemblyInfo.cs
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\Bigbasket_Ecommerce.MvcApplicationPartsAssemblyInfo.cache
+D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\Bigbasket_Ecommerce.sourcelink.json
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\scopedcss\bundle\Bigbasket_Ecommerce.styles.css
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\staticwebassets.build.json
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\staticwebassets.development.json
@@ -298,5 +300,6 @@ D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\refint\Bigbasket_Ecommerce.dll
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\Bigbasket_Ecommerce.pdb
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\Bigbasket_Ecommerce.genruntimeconfig.cache
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\ref\Bigbasket_Ecommerce.dll
-D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\BCrypt.Net-Next.dll
-D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\Bigbasket_Ecommerce.sourcelink.json
+D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\MailKit.dll
+D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\MimeKit.dll

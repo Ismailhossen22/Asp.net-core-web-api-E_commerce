@@ -1,6 +1,22 @@
 [
   {
     "ContainingType": "Bigbasket_Ecommerce.Controllers.AccountController",
+    "Method": "ForgotPassword",
+    "RelativePath": "api/Account/forgot-password",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "Bigbasket_Ecommerce.Models.Dto.ForgotPasswordDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Bigbasket_Ecommerce.Controllers.AccountController",
     "Method": "GetAllUser",
     "RelativePath": "api/Account/GetAllUser",
     "HttpMethod": "GET",
@@ -68,6 +84,22 @@
       {
         "Name": "users",
         "Type": "Bigbasket_Ecommerce.Models.Dto.RegisterUserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Bigbasket_Ecommerce.Controllers.AccountController",
+    "Method": "ResetPassword",
+    "RelativePath": "api/Account/reset-password",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "Bigbasket_Ecommerce.Models.Dto.ResetPasswordDto",
         "IsRequired": true
       }
     ],

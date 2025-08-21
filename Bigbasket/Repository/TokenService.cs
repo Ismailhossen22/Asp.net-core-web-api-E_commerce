@@ -30,7 +30,7 @@ namespace Bigbasket_Ecommerce.Repository
                 new Claim(ClaimTypes.Name,user.Name),
                 new Claim(ClaimTypes.Email,user.Email),
                 new Claim(ClaimTypes.Role,"User"),
-                new Claim(JwtRegisteredClaimNames.Sub,user.Id.ToString())
+                new Claim(JwtRegisteredClaimNames.Sub,user.UserId.ToString())
             };
             var key = _Configuration["JwtSettings:Key"];
             byte[] bytkey = Encoding.UTF8.GetBytes(key);

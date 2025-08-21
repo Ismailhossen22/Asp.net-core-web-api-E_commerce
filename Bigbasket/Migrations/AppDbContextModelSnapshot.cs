@@ -39,6 +39,97 @@ namespace Bigbasket_Ecommerce.Migrations
                     b.ToTable("Categorys");
                 });
 
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.Customers", b =>
+                {
+                    b.Property<int>("CustomerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerId"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PostalCode")
+                        .HasColumnType("int");
+
+                    b.HasKey("CustomerId");
+
+                    b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.Employees", b =>
+                {
+                    b.Property<int>("EmployeeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"));
+
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Photo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EmployeeId");
+
+                    b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.Orders", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
+
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ShipperId")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ShipperId");
+
+                    b.ToTable("Orders");
+                });
+
             modelBuilder.Entity("Bigbasket_Ecommerce.Models.Products", b =>
                 {
                     b.Property<int>("ProductId")
@@ -47,7 +138,7 @@ namespace Bigbasket_Ecommerce.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
 
-                    b.Property<int>("Category_ID")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreateTime")
@@ -62,7 +153,6 @@ namespace Bigbasket_Ecommerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductDescription")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductName")
@@ -78,6 +168,8 @@ namespace Bigbasket_Ecommerce.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ProductId");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
                 });
@@ -104,7 +196,7 @@ namespace Bigbasket_Ecommerce.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -116,61 +208,187 @@ namespace Bigbasket_Ecommerce.Migrations
 
             modelBuilder.Entity("Bigbasket_Ecommerce.Models.Role", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("RoleId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleId"), 101L);
 
                     b.Property<string>("NormalizedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("RoleId");
 
                     b.ToTable("Role");
                 });
 
-            modelBuilder.Entity("Bigbasket_Ecommerce.Models.User", b =>
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.Shippers", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ShipperId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShipperId"), 101L);
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ShipperName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ShipperId");
+
+                    b.ToTable("Shippers");
+                });
+
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.User", b =>
+                {
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Hashpassword")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OtpCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("OtpExpiry")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId");
 
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.UserRole", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("UserRole");
+                });
+
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.Orders", b =>
+                {
+                    b.HasOne("Bigbasket_Ecommerce.Models.Customers", "Customers")
+                        .WithMany("Orders")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Bigbasket_Ecommerce.Models.Employees", "Employees")
+                        .WithMany("Orders")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Bigbasket_Ecommerce.Models.Shippers", "Shippers")
+                        .WithMany("Orders")
+                        .HasForeignKey("ShipperId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Customers");
+
+                    b.Navigation("Employees");
+
+                    b.Navigation("Shippers");
+                });
+
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.Products", b =>
+                {
+                    b.HasOne("Bigbasket_Ecommerce.Models.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("Bigbasket_Ecommerce.Models.RefreshToken", b =>
                 {
-                    b.HasOne("Bigbasket_Ecommerce.Models.User", "user")
-                        .WithMany()
+                    b.HasOne("Bigbasket_Ecommerce.Models.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.UserRole", b =>
+                {
+                    b.HasOne("Bigbasket_Ecommerce.Models.Role", "Role")
+                        .WithMany("UserRole")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bigbasket_Ecommerce.Models.User", "User")
+                        .WithMany("UserRole")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("user");
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.Category", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.Customers", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.Employees", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.Role", b =>
+                {
+                    b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.Shippers", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("Bigbasket_Ecommerce.Models.User", b =>
+                {
+                    b.Navigation("RefreshTokens");
+
+                    b.Navigation("UserRole");
                 });
 #pragma warning restore 612, 618
         }

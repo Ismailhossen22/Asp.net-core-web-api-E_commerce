@@ -30,7 +30,7 @@ namespace Bigbasket_Ecommerce.Models.Dto
        // public DateTime CreateTime { get; set; } 
 
        
-        public int Category_ID { get; set; }
+        public int? Category_ID { get; set; }
 
        
 

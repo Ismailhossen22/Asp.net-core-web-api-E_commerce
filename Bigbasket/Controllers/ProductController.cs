@@ -90,6 +90,7 @@ namespace Bigbasket_Ecommerce.Controllers
 
             try {
                 var productitem = await _productRepository.GetById(id);
+
                 if (productitem == null)
                 {
                     return NotFound(" Id not valid against not found data>....!!!");
@@ -102,7 +103,7 @@ namespace Bigbasket_Ecommerce.Controllers
                     ProductPrice = productitem.ProductPrice,
                     DelevaryTimeSpan = productitem.DelevaryTimeSpan,
                     ImageFile = productitem.ImageFile,
-                    Category_ID = productitem.Category_ID
+                    Category_ID = productitem.CategoryId
 
 
                 };

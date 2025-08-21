@@ -35,7 +35,7 @@ namespace Bigbasket_Ecommerce.Repository
                  DelevaryTimeSpan=productdto.DelevaryTimeSpan,
                  CreateTime=DateTime.UtcNow,
                  ImageFile=productdto.ImageFile,
-                 Category_ID= productdto.Category_ID
+                 CategoryId= productdto.Category_ID
              
 
 
@@ -95,7 +95,7 @@ namespace Bigbasket_Ecommerce.Repository
 
         public async Task<IEnumerable< ProductDto>> GetcategoryProductById(int Categoryid)
         {
-            var product = await _context.Products.Where(p => p.Category_ID == Categoryid).Select(p => new ProductDto
+            var product = await _context.Products.Where(p => p.CategoryId == Categoryid).Select(p => new ProductDto
             {
                 ProductName = p.ProductName,
                 ProductShortName = p.ProductShortName,
@@ -129,7 +129,7 @@ namespace Bigbasket_Ecommerce.Repository
             productItem.ProductPrice = productdto.ProductPrice;
             productItem.ProductDescription = productdto.ProductDescription;
             productItem.ImageFile = productdto.ImageFile;
-            productItem.Category_ID = productdto.Category_ID;
+            productItem.CategoryId = productdto.Category_ID;
             await _context.SaveChangesAsync();
         }
 

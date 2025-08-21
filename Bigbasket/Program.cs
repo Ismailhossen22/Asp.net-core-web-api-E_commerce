@@ -19,7 +19,7 @@ builder.Services.AddControllers();
 builder.Services.AddTransient<IproductRepository, productRepository>();
 builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<TokenService>();
-
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 //enable jwt token
