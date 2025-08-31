@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Bigbasket_Ecommerce.Models.Dto
+namespace Bigbasket_Ecommerce.Dto
 {
     public class ProductDto
     {
@@ -27,10 +27,7 @@ namespace Bigbasket_Ecommerce.Models.Dto
         public string ProductDescription { get; set; }
 
 
-       // public DateTime CreateTime { get; set; } 
-
-       
-        public int? Category_ID { get; set; }
+        public int CategoryId { get; set; }
 
        
 

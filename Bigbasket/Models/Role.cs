@@ -9,7 +9,7 @@ namespace Bigbasket_Ecommerce.Models
         [Required]
         public string RoleName { get; set; }
         public string? NormalizedName { get; set; }
-        public ICollection<UserRole>? UserRole { get; set; }
+        public ICollection<UserRole> UserRole { get; set; }
 
 
 

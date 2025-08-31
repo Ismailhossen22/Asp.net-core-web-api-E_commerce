@@ -11,6 +11,9 @@ namespace Bigbasket_Ecommerce.Models
         public DateTime BirthDate { get; set; }
         public string? Photo { get; set; }
 
-        public ICollection<Orders>? Orders { get; set; }
+        public ICollection<Order>? Orders { get; set; }
+
+
+
     }
 }

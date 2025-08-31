@@ -1,6 +1,7 @@
 ﻿using Bigbasket_Ecommerce.Data;
+using Bigbasket_Ecommerce.Dto;
 using Bigbasket_Ecommerce.Models;
-using Bigbasket_Ecommerce.Models.Dto;
+
 using Bigbasket_Ecommerce.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -26,30 +27,32 @@ namespace Bigbasket_Ecommerce.Controllers
             _Context = context;
             _tokenService = tokenService;
             _EmailService = emailService;
+
         }
 
 
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register(RegisterUserDto users)
+        public async Task<IActionResult> Register(RegisterUserDto model)
 
         {
 
             try
             {
-                var ExistUser = _Context.User.FirstOrDefault(user => user.Email == users.Email);
+                var ExistUser = _Context.User.FirstOrDefault(user => user.Email == model.Email);
 
                 if (ExistUser != null)
                 {
-                    return NotFound(new ApiResponse<string> { message = "User Already Exist", status = false });
+                    return Ok(new ApiResponse<string> { message = "User Already Exist", status = false });
                 }
-                string HashPassword = BCrypt.Net.BCrypt.HashPassword(users.password);
+                string HashPassword = BCrypt.Net.BCrypt.HashPassword(model.password);
+                
 
                 var user = new User
                 {
 
-                    Name = users.Name,
-                    Email = users.Email,
+                    Name = model.Name,
+                    Email = model.Email,
                     Hashpassword = HashPassword
 
 
@@ -57,7 +60,22 @@ namespace Bigbasket_Ecommerce.Controllers
 
 
                 _Context.User.Add(user);
-                _Context.SaveChanges();
+               await _Context.SaveChangesAsync();
+                //Role assign
+                var roleName = string.IsNullOrEmpty(model.Role) ? "User" : model.Role;
+                var role = await _Context.Role.FirstOrDefaultAsync(r => r.RoleName == roleName);
+                 if(role != null)
+                {
+                    _Context.UserRole.Add(new UserRole
+                    {
+                        UserId = user.UserId,
+                        RoleId = role.RoleId
+
+                    });
+                    await _Context.SaveChangesAsync();
+                }
+              
+
                 return Ok(new ApiResponse<string> { message = "User Create Successful", status = true });
             }
             catch (Exception ex)
@@ -78,39 +96,44 @@ namespace Bigbasket_Ecommerce.Controllers
 
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody] loginDto logindtos)
+        public async Task<IActionResult> Login([FromBody] loginDto model)
         {
 
             try
             {
-                var user = await _Context.User.FirstOrDefaultAsync(u => u.Email == logindtos.Email);
+                var user = await _Context.User.Include(u => u.UserRole)
+                    .ThenInclude(ur => ur.Role)
+                    .FirstOrDefaultAsync(u => u.Email == model.Email);
 
-                if (user == null)
+                if (user == null )
                 {
-                    return Ok(new ApiResponse<loginDto> { message = "User  or password Invalid", status = false });
+                    return Ok(new ApiResponse<loginDto> { message = "User  Invalid please right Email", status = false });
                 }
-                bool isValidPassword = BCrypt.Net.BCrypt.Verify(logindtos.Password, user.Hashpassword);
+                bool isValidPassword = BCrypt.Net.BCrypt.Verify(model.Password, user.Hashpassword);
                 if (!isValidPassword)
                 {
-                    return Ok(new ApiResponse<loginDto> { message = "User  or password Invalid", status = false });
+                    return Ok(new ApiResponse<loginDto> { message = " Password Invalid!! please right password", status = false });
                 }
 
-                var userdto = new UserDto
+                var userItem = new UserDto
                 {
                     Id = user.UserId,
                     Email = user.Email,
                     Name = user.Name
 
                 };
+                var role = user.UserRole.Select(ur => ur.Role.RoleName).ToList() ;
 
-                var AccessToken = _tokenService.GenerateAccessToken(user);
+                var AccessToken = _tokenService.GenerateAccessToken(user,role);
                 var RefreshToken = _tokenService.GenerateRefreshToken(user.UserId);
 
                 var tokenData = new LoginResponse
                 {
                     AccessToken = AccessToken,
                     RefreshToken = RefreshToken,
-                    User = userdto
+                    User = userItem,
+                    Role=role
+                   
                 };
 
                 return base.Ok(new ApiResponse<LoginResponse> { message = "Login Successful", status = true, Data = tokenData });
@@ -165,9 +188,12 @@ namespace Bigbasket_Ecommerce.Controllers
                     return Unauthorized(new ApiResponse<string> { message = "Invalid or Expired Refresh token", status = false });
 
                 //stored.IsRevoked = true;
+                       var roles = await _Context.UserRole
+                   .Where(ur => ur.UserId == stored.User.UserId)
+                   .Select(ur => ur.Role.RoleName)
+                   .ToListAsync();
 
-
-                var NewAccessToken = _tokenService.GenerateAccessToken(stored.User);
+                var NewAccessToken = _tokenService.GenerateAccessToken(stored.User, roles);
                 var NewRefreshToken = _tokenService.GenerateRefreshToken(stored.User.UserId);
 
                 //stored.IsRevoked = true;
@@ -176,7 +202,7 @@ namespace Bigbasket_Ecommerce.Controllers
 
                 var token = new LoginResponse
                 {
-                    AccessToken = NewAccessToken,
+                   // AccessToken = NewAccessToken,
                     RefreshToken = NewRefreshToken,
 
                 };
@@ -247,7 +273,7 @@ namespace Bigbasket_Ecommerce.Controllers
                 var user = await _Context.User.FirstOrDefaultAsync(u => u.Email == model.Email);
                 if (user == null)
                 {
-                    return BadRequest("User not found");
+                    return Ok("User not found");
                 }
 
                 var otp = new Random().Next(100000, 999999).ToString();
@@ -257,7 +283,7 @@ namespace Bigbasket_Ecommerce.Controllers
 
                 await _Context.SaveChangesAsync();
 
-                await _EmailService.SendEmailAsync(user.Email, "Password Reset OTP", $"Your OTP Code is <b> {otp} </b>.It Will Expire in 5 minutes");
+                await _EmailService.SendEmailAsync(user.Email, " Password Reset OTP! ", $" <h2> Your OTP Code is <b> {otp} </b>.It Will Expire in 5 minutes</h2> <h1> To Reset Password this OTP </h1>");
 
 
 
@@ -291,7 +317,7 @@ namespace Bigbasket_Ecommerce.Controllers
 
                 if (user == null)
                 {
-                    return BadRequest(new { message = "User not found", status = false });
+                    return Ok(new { message = "User is Invalid", status = false });
 
 
                 }
@@ -299,7 +325,7 @@ namespace Bigbasket_Ecommerce.Controllers
                 if (user.OtpCode != model.OtpCode || user.OtpExpiry < DateTime.UtcNow)
                 {
 
-                    return BadRequest(new { message = "Invalid or expired OTP", status = false });
+                    return Ok(new { message = "Invalid or expired OTP", status = false });
                 }
                 // hashPassword save
                 user.Hashpassword = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);

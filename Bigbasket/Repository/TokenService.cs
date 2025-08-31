@@ -1,8 +1,9 @@
 ﻿using Bigbasket_Ecommerce.Data;
 using Bigbasket_Ecommerce.Models;
-using Bigbasket_Ecommerce.Models.Dto;
+
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.IdentityModel.Tokens;
+using NuGet.Packaging;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -22,16 +23,21 @@ namespace Bigbasket_Ecommerce.Repository
             _Configuration = configuration;
         }
 
-        public string GenerateAccessToken(User user)
+        public string GenerateAccessToken(User user,List<string> roles)
         {
 
-            var claims = new[]
+
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name,user.Name),
                 new Claim(ClaimTypes.Email,user.Email),
-                new Claim(ClaimTypes.Role,"User"),
-                new Claim(JwtRegisteredClaimNames.Sub,user.UserId.ToString())
+                new Claim(ClaimTypes.NameIdentifier,user.UserId.ToString())
             };
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
             var key = _Configuration["JwtSettings:Key"];
             byte[] bytkey = Encoding.UTF8.GetBytes(key);
             var keys = new SymmetricSecurityKey(bytkey);

@@ -1,6 +1,6 @@
 ﻿using Bigbasket_Ecommerce.Data;
+using Bigbasket_Ecommerce.Dto;
 using Bigbasket_Ecommerce.Models;
-using Bigbasket_Ecommerce.Models.Dto;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -23,10 +23,39 @@ namespace Bigbasket_Ecommerce.Repository
             _context = context;
         }
 
+        public async Task AddToCart(CardItemDto cardDto)
+        {
+
+            
+
+
+
+
+
+            throw new NotImplementedException();
+        }
+        public Task<IEnumerable<CardItemDto>> GetCart(int customerId)
+        {
+            throw new NotImplementedException();
+        }
+        public Task Checkout(int customerId)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+
+
+
+
+
+
+
         public async Task AddProduct(ProductDto productdto)
         {
 
-            var product = new Products
+            var product = new Product
             {
                  ProductName= productdto.ProductName,
                  ProductShortName=productdto.ProductShortName,
@@ -35,7 +64,7 @@ namespace Bigbasket_Ecommerce.Repository
                  DelevaryTimeSpan=productdto.DelevaryTimeSpan,
                  CreateTime=DateTime.UtcNow,
                  ImageFile=productdto.ImageFile,
-                 CategoryId= productdto.Category_ID
+                 CategoryId= productdto.CategoryId
              
 
 
@@ -49,6 +78,8 @@ namespace Bigbasket_Ecommerce.Repository
 
         }
 
+      
+
         public async Task Delete(int id)
         {
             var data = await _context.Products.FindAsync(id);
@@ -61,7 +92,7 @@ namespace Bigbasket_Ecommerce.Repository
            await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Products>> GetAllAsync()
+        public async Task<IEnumerable<Product>> GetAllAsync()
         {
             return await _context.Products.ToListAsync();
 
@@ -69,9 +100,13 @@ namespace Bigbasket_Ecommerce.Repository
 
             
         }
-       
 
-        public async Task< Products?> GetById(int id)
+        public  IQueryable<Product> GetAllAsync(int pageNumber, int pageSize)
+        {
+            return _context.Products.AsQueryable();
+        }
+
+        public async Task< Product?> GetById(int id)
         {
            return  await _context.Products.FindAsync(id);
 
@@ -93,9 +128,12 @@ namespace Bigbasket_Ecommerce.Repository
 
         }
 
-        public async Task<IEnumerable< ProductDto>> GetcategoryProductById(int Categoryid)
+       
+
+        public async Task<IEnumerable< ProductDto>> GetcategoryProductById(int CategoryId)
         {
-            var product = await _context.Products.Where(p => p.CategoryId == Categoryid).Select(p => new ProductDto
+            var product = await _context.Products.Where(p => p.CategoryId == CategoryId)
+                .Select(p => new ProductDto
             {
                 ProductName = p.ProductName,
                 ProductShortName = p.ProductShortName,
@@ -116,7 +154,7 @@ namespace Bigbasket_Ecommerce.Repository
             throw new NotImplementedException();
         }
 
-        public async Task Update(ProductDto productdto,int id )
+        public async Task Update(int id, ProductDto productdto)
         {
             var productItem = await _context.Products.FindAsync(id);
 
@@ -129,17 +167,18 @@ namespace Bigbasket_Ecommerce.Repository
             productItem.ProductPrice = productdto.ProductPrice;
             productItem.ProductDescription = productdto.ProductDescription;
             productItem.ImageFile = productdto.ImageFile;
-            productItem.CategoryId = productdto.Category_ID;
+            productItem.CategoryId = productdto.CategoryId;
             await _context.SaveChangesAsync();
         }
 
+        public Task<IEnumerable<CardItemDto>> GetCartItem(int customerId, int productId)
+        {
+            throw new NotImplementedException();
+        }
 
-
-
-
-
-
-
-
+        public void Update(CardItemDto cartItem)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

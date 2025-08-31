@@ -1,4 +1,4 @@
-﻿using Bigbasket_Ecommerce.Models.Dto;
+﻿using Bigbasket_Ecommerce.Dto;
 
 namespace Bigbasket_Ecommerce.Models
 {
@@ -8,9 +8,8 @@ namespace Bigbasket_Ecommerce.Models
         public string RefreshToken { get; set; }
 
         public UserDto User { get; set; }
+        public List<string> Role { get; set; }
 
-
-
-
+       
     }
 }

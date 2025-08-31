@@ -5,6 +5,7 @@ namespace Bigbasket_Ecommerce.Models
 {
     public class RefreshToken
     {
+        [Key]
         public int Id { get; set; }
        
         public int? UserId { get; set; }

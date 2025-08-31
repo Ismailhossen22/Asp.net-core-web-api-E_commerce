@@ -1,21 +1,31 @@
-﻿using Bigbasket_Ecommerce.Models;
-using Bigbasket_Ecommerce.Models.Dto;
+﻿using Bigbasket_Ecommerce.Dto;
+
+using Bigbasket_Ecommerce.Models;
 using System.Web.Mvc;
 
 namespace Bigbasket_Ecommerce.Repository
 {
     public interface IproductRepository
     {
-       Task< IEnumerable<Products> > GetAllAsync();
+        IQueryable<Product>  GetAllAsync(int pageNumber,int pageSize);
       
 
-        Task<Products?>  GetById(int id);
-        Task< IEnumerable< ProductDto>> GetcategoryProductById(int Categoryid);
+        Task<Product?>  GetById(int id);
+        Task< IEnumerable< ProductDto>> GetcategoryProductById(int CategoryId);
 
          Task AddProduct ( ProductDto productdto);
-        Task Update(ProductDto productdto,int id);
+        Task Update(int id, ProductDto productdto);
         Task Delete(int id);
         void Save();
+
+        //cardService
+        Task AddToCart(CardItemDto cardDto);
+        Task<IEnumerable<CardItemDto>> GetCartItem(int customerId,int productId);
+        Task Checkout(int customerId);
+
+      
+        void Update(CardItemDto cartItem);
+    
 
 
     }

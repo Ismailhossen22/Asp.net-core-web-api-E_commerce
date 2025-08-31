@@ -1,10 +1,12 @@
-﻿using Bigbasket_Ecommerce.Models;
-using Bigbasket_Ecommerce.Models.Dto;
+﻿using Bigbasket_Ecommerce.Dto;
+using Bigbasket_Ecommerce.Models;
 using Bigbasket_Ecommerce.Repository;
+using Bigbasket_Ecommerce.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Build.Evaluation;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bigbasket_Ecommerce.Controllers
 {
@@ -15,13 +17,14 @@ namespace Bigbasket_Ecommerce.Controllers
     {
 
         private IproductRepository _productRepository;
+        private readonly ICardServices _cardServices;
 
 
 
-
-        public ProductController(IproductRepository productRepository)
+        public ProductController(IproductRepository productRepository, ICardServices cardServices)
         {
             _productRepository = productRepository;
+            _cardServices = cardServices;
         }
 
 
@@ -40,7 +43,7 @@ namespace Bigbasket_Ecommerce.Controllers
             {
                 return StatusCode(500, new
                 {
-                    message = $"Something went wrong: {ex.Message}",
+                    message = $"Something went wrong: {ex.InnerException.Message}",
                     status = false
 
 
@@ -53,16 +56,32 @@ namespace Bigbasket_Ecommerce.Controllers
 
         [HttpGet]
         [Route("GetAllProduct")]
-        [Authorize]
-        public async Task<IActionResult> GetAllProduct()
+    
+        public async Task<IActionResult> GetAllProduct(int pageNumber=1,int pageSize=5)
         {
 
             try
             {
-                var product = await _productRepository.GetAllAsync();
+                var productItem =  _productRepository.GetAllAsync( pageNumber, pageSize).OrderBy(p=>p.ProductId);
+
+                var totalCount = await productItem.CountAsync();
+
+                var product = await productItem.Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize).ToListAsync();
+
                 if (product != null)
                 {
-                    return Ok(new ApiResponse<IEnumerable<Products>> { message = "data fetched successfully", status = true, Data = product });
+                    return Ok(new
+                    {
+                        message = "product fetched successfully",
+                        status = true,
+                        data = product,
+                        TotalCount = totalCount,
+                        PageNumber = pageNumber,
+                        PageSize = pageSize
+                        
+                    });
+
                 }
                 return NotFound();
 
@@ -82,14 +101,14 @@ namespace Bigbasket_Ecommerce.Controllers
         }
 
 
-        [HttpGet("{id}")]
-    
+        [HttpGet("GetProductById")]
+         
       
-        public async Task<ActionResult<ProductDto>> GetProductById(int id)
+        public async Task<ActionResult<ProductDto>> GetProductById(int Productid)
         {
 
             try {
-                var productitem = await _productRepository.GetById(id);
+                var productitem = await _productRepository.GetById(Productid);
 
                 if (productitem == null)
                 {
@@ -103,7 +122,7 @@ namespace Bigbasket_Ecommerce.Controllers
                     ProductPrice = productitem.ProductPrice,
                     DelevaryTimeSpan = productitem.DelevaryTimeSpan,
                     ImageFile = productitem.ImageFile,
-                    Category_ID = productitem.CategoryId
+                    CategoryId = productitem.CategoryId
 
 
                 };
@@ -133,14 +152,14 @@ namespace Bigbasket_Ecommerce.Controllers
         {
             try
             {
-                await _productRepository.Update(productdto, id);
+                await _productRepository.Update(id,productdto);
                 return Ok(new { message = "update successful", status = true, });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new
                 {
-                    message = $"internal server Error:{ex.Message} ",
+                    message = $"internal server Error:{ex.InnerException.Message} ",
                     status = false
 
                 });
@@ -149,7 +168,7 @@ namespace Bigbasket_Ecommerce.Controllers
 
         }
 
-        [HttpDelete("{id}") ]
+        [HttpDelete("id") ]
         public async Task<ActionResult> DeleteProduct(int id)
         {
 
@@ -175,14 +194,18 @@ namespace Bigbasket_Ecommerce.Controllers
 
 
 
-        [HttpGet("{categoryId}")]
+        [HttpGet("categoryId")]
         
-        public async Task<IActionResult> getCategoryProductId(int categoryId)
+        public async Task<IActionResult> GetCategoryProductId(int categoryId)
         {
             try {
-                var data = await _productRepository.GetcategoryProductById(categoryId);
-                return Ok(new {message="product successful",status=true,data=data} );
-
+                var product = await _productRepository.GetcategoryProductById(categoryId);
+                if (product ==null)
+                {
+                    return NotFound(new { message = "Not found product against Id", status = false });
+                }
+                return Ok(new { message = "product successful", status = true, data = product });
+              
 
             }
             catch(Exception ex)
@@ -197,6 +220,103 @@ namespace Bigbasket_Ecommerce.Controllers
             }
             
         }
+
+        // Customer Order
+
+
+        //order  processing Methode Implement
+
+
+
+        [HttpPost("AddCart")]
+        public async Task<IActionResult> AddCart([FromBody] CardItemDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    message = "Invalid input data",
+                    status = false
+                });
+            }
+
+            try
+            {
+                await _cardServices.AddToCart(dto);
+                return Ok(new
+                {
+                    message = "Cart item added successfully",
+                    status = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = $"Internal Server error: {ex.Message}",  // শুধু ex.Message safe
+                    status = false
+                });
+            }
+        }
+
+        [HttpGet("checkout-preview/{customerId}")]
+        public async Task<IActionResult> CheckoutPreview(int customerId )
+        {
+            try
+            {
+                var cardItem = await _cardServices.CheckoutPreview(customerId);
+                if (cardItem == null)
+                {
+                    return Ok(new { message = "CardItem not found", status = false });
+                }
+                return Ok(new
+                {
+                    message="Data fetch complete",
+                         status=true,
+                      data = cardItem
+                });
+               
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message=$"Internal Server error={ex.InnerException?.Message } ",
+                    status=false
+
+                });
+            }
+
+
+            
+        }
+        [HttpPost("ConfirmOrder")]
+
+        public async Task<IActionResult> ConfirmOrder(int customerId)
+        {
+            try
+            {
+               var order= await _cardServices.Checkout(customerId);
+                return Ok(new
+                {
+                    message = "Order Confirmed Successful",
+                    status = true,
+                    data = order
+                });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = $"Internal Server error: {ex.Message}",  // শুধু ex.Message safe
+                    status = false
+                });
+            }
+        }
+
+
+
 
 
     }

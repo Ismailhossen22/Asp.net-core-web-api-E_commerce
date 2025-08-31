@@ -11,7 +11,7 @@ namespace Bigbasket_Ecommerce.Models
         public string CategoryName { get; set; }
 
       
-        public ICollection<Products>? Products { get; set; }
+        public ICollection<Product>? Products { get; set; }
       
        
 

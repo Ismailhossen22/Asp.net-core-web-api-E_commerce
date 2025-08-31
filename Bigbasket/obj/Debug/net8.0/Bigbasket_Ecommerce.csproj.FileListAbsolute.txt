@@ -9,7 +9,9 @@ D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Bigbasket_Ecommerce.pdb
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Azure.Core.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Azure.Identity.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\BCrypt.Net-Next.dll
+D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Humanizer.dll
+D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\MailKit.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\System.Web.Mvc.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\System.Web.Razor.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\System.Web.Helpers.dll
@@ -79,6 +81,7 @@ D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Microsoft.VisualStudio.Web.Code
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Microsoft.VisualStudio.Web.CodeGeneration.Utils.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Microsoft.VisualStudio.Web.CodeGenerators.Mvc.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Microsoft.Web.Infrastructure.dll
+D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\MimeKit.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Mono.TextTemplating.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Newtonsoft.Json.dll
 D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\Newtonsoft.Json.Bson.dll
@@ -300,6 +303,3 @@ D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\refint\Bigbasket_Ecommerce.dll
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\Bigbasket_Ecommerce.pdb
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\Bigbasket_Ecommerce.genruntimeconfig.cache
 D:\Projects\Bigbasket\Bigbasket\obj\Debug\net8.0\ref\Bigbasket_Ecommerce.dll
-D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
-D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\MailKit.dll
-D:\Projects\Bigbasket\Bigbasket\bin\Debug\net8.0\MimeKit.dll

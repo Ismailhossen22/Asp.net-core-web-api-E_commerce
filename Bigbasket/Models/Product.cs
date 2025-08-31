@@ -5,38 +5,38 @@ using System.Data;
 
 namespace Bigbasket_Ecommerce.Models
 {
-    public class Products
+    public class Product
     {
         [Key]
        public int ProductId { get; set; }
-        [Required]
-        [MaxLength(50)]
+    
         public string ProductName { get; set; }
-        [Required]
+     
      
         public string? ProductShortName { get; set; }
-        [Required]
+    
         public double ProductPrice { get; set; }
-        [Required]
+        public int Stock { get; set; }
 
         public string? DelevaryTimeSpan { get; set; }
 
-        [Required]
+    
         public string? ImageFile { get; set; }
        
        
         public string? ProductDescription { get; set; }
-        [Required]
+     
 
         public DateTime CreateTime { get; set; } 
       
-
         
-       
-        public int? CategoryId { get; set; }
+  
+        public int CategoryId { get; set; }
 
-   
-        public Category? Category { get; set; }
+
+        public Category Category { get; set; } = null!;
+
+        public CartItem? CartItem { get; set; }
        
 
 

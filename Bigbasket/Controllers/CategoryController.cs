@@ -1,5 +1,5 @@
-﻿using Bigbasket_Ecommerce.Models;
-using Bigbasket_Ecommerce.Models.Dto;
+﻿using Bigbasket_Ecommerce.Dto;
+using Bigbasket_Ecommerce.Models;
 using Bigbasket_Ecommerce.Repository;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;

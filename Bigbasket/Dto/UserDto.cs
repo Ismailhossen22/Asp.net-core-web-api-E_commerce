@@ -1,4 +1,4 @@
-﻿namespace Bigbasket_Ecommerce.Models.Dto
+﻿namespace Bigbasket_Ecommerce.Dto
 {
     public class UserDto
     {
@@ -7,9 +7,9 @@
         public string Name { get; set; } = null!;
 
         public string Email { get; set; } = null!;
-      
-      
-        
+
+       // public string? Role { get; set; }
+
 
 
 

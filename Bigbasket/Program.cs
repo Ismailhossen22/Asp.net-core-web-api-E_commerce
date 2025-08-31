@@ -1,5 +1,6 @@
 using Bigbasket_Ecommerce.Data;
 using Bigbasket_Ecommerce.Repository;
+using Bigbasket_Ecommerce.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -13,13 +14,19 @@ var Connectionstring = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(Connectionstring));
 // Defendency injection
 
+// Repositories
+builder.Services.AddScoped<IproductRepository, productRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICardItemRepository, CardItemRepository>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>)); // generic repo
 
-
-builder.Services.AddControllers();
-builder.Services.AddTransient<IproductRepository, productRepository>();
-builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
+// Services
+builder.Services.AddScoped<ICardServices, CardServices>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+
+builder.Services.AddControllers();
+
 
 
 //enable jwt token

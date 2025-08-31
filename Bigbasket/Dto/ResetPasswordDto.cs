@@ -1,4 +1,4 @@
-﻿namespace Bigbasket_Ecommerce.Models.Dto
+﻿namespace Bigbasket_Ecommerce.Dto
 {
     public class ResetPasswordDto
     {
