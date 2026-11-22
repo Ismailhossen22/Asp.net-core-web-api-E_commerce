@@ -1,9 +1,7 @@
-﻿using Bigbasket_Ecommerce.Data;
+﻿using Azure;
+using Bigbasket_Ecommerce.Data;
 using Bigbasket_Ecommerce.Models;
-
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.IdentityModel.Tokens;
-using NuGet.Packaging;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -14,13 +12,18 @@ namespace Bigbasket_Ecommerce.Repository
     public class TokenService
     {
         public readonly AppDbContext _Context;
-
+        private readonly IHttpContextAccessor _httpContextAccessor;
         public readonly IConfiguration _Configuration;
 
-        public TokenService(AppDbContext context, IConfiguration configuration)
+        public TokenService(AppDbContext context,
+            IConfiguration configuration,
+             IHttpContextAccessor httpContextAccesso
+
+            )
         {
             _Context = context;
             _Configuration = configuration;
+            _httpContextAccessor = httpContextAccesso;
         }
 
         public string GenerateAccessToken(User user,List<string> roles)
@@ -103,6 +106,69 @@ namespace Bigbasket_Ecommerce.Repository
             }
 
         }
+
+        // Remove the SetAuthCookies method entirely, as 'Response.Cookies' is not available in this context.
+        // If you need to set cookies, this should be handled in a Controller or Middleware where HttpContext is available.
+        // The following code removes the method to resolve CS0117.
+
+        public void SetAuthCookies(string accessToken, string refreshToken)
+        {
+            var accessMinutes = Convert.ToDouble(_Configuration["JwtSettings:AccessTokenExpiryMinutes"]);
+            var refreshDays = Convert.ToInt32(_Configuration["JwtSettings:RefreshTokenExpiryDays"]);
+            var response = _httpContextAccessor.HttpContext?.Response ?? throw new InvalidOperationException("HttpContext is not available.");
+
+             response.Cookies.Append("access_token", accessToken, new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                 Path = "/",
+                 Expires = DateTimeOffset.UtcNow.AddMinutes(accessMinutes)
+            });
+
+           response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                //Path = "/api/auth/refresh",
+                 Path = "/",
+               Expires = DateTimeOffset.UtcNow.AddDays(refreshDays)
+            });
+        }
+
+
+
+
+
+
+        public void DeleteAuthCookies()
+        {
+            var response = _httpContextAccessor.HttpContext?.Response
+                ?? throw new InvalidOperationException("HttpContext is not available.");
+
+            response.Cookies.Delete("access_token", new CookieOptions
+            {
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Path = "/"
+            });
+
+            
+            response.Cookies.Delete("refresh_token", new CookieOptions
+            {
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Path = "/api/Account"
+            });
+        }
+
+
+
+
+
+
+
 
 
 

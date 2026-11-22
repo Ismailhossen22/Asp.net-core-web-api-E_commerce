@@ -126,6 +126,7 @@ namespace Bigbasket_Ecommerce.Controllers
 
                 var AccessToken = _tokenService.GenerateAccessToken(user,role);
                 var RefreshToken = _tokenService.GenerateRefreshToken(user.UserId);
+                _tokenService.SetAuthCookies(AccessToken, RefreshToken);
 
                 var tokenData = new LoginResponse
                 {
@@ -183,6 +184,12 @@ namespace Bigbasket_Ecommerce.Controllers
         {
             try
             {
+                //var refreshToken = Request.Cookies["refresh_token"];
+                //if (string.IsNullOrEmpty(refreshToken))
+                //    return Unauthorized(new ApiResponse<string> { message = "Refresh token missing", status = false });
+
+
+
                 var stored = await _Context.RefreshTokens.Include(res => res.User).FirstOrDefaultAsync(r => r.RefreshUserToken == model.RefreshToken);
                 if (stored == null || stored.IsRevoked || stored.Expires < DateTime.UtcNow)
                     return Unauthorized(new ApiResponse<string> { message = "Invalid or Expired Refresh token", status = false });
@@ -193,9 +200,9 @@ namespace Bigbasket_Ecommerce.Controllers
                    .Select(ur => ur.Role.RoleName)
                    .ToListAsync();
 
-                var NewAccessToken = _tokenService.GenerateAccessToken(stored.User, roles);
-                var NewRefreshToken = _tokenService.GenerateRefreshToken(stored.User.UserId);
-
+                var newAccessToken = _tokenService.GenerateAccessToken(stored.User, roles);
+                var newRefreshToken = _tokenService.GenerateRefreshToken(stored.User.UserId);
+                _tokenService.SetAuthCookies(newAccessToken, newRefreshToken);
                 //stored.IsRevoked = true;
                 //_Context.SaveChangesAsync();
                 //  _tokenService.RevokeRefreshToken(model.RefreshToken);
@@ -203,7 +210,7 @@ namespace Bigbasket_Ecommerce.Controllers
                 var token = new LoginResponse
                 {
                    // AccessToken = NewAccessToken,
-                    RefreshToken = NewRefreshToken,
+                    RefreshToken = newRefreshToken,
 
                 };
 
@@ -232,6 +239,56 @@ namespace Bigbasket_Ecommerce.Controllers
 
 
         }
+
+
+        //[HttpPost("Refresh")]
+        //public async Task<IActionResult> Refresh()  
+        //{
+        //    try
+        //    {
+        //        var refreshToken = Request.Cookies["refresh_token"];
+        //        if (string.IsNullOrEmpty(refreshToken))
+        //            return Unauthorized(new ApiResponse<string> { message = "Refresh token missing", status = false });
+
+        //        var stored = await _Context.RefreshTokens
+        //            .Include(r => r.User)
+        //            .FirstOrDefaultAsync(r => r.RefreshUserToken == refreshToken);
+
+        //        if (stored == null || stored.IsRevoked || stored.Expires < DateTime.UtcNow)
+        //        {
+        //            _tokenService.DeleteAuthCookies();
+        //            return Unauthorized(new ApiResponse<string> { message = "Invalid or Expired Refresh token", status = false });
+        //        }
+
+        //        // পুরনো token বাতিল (rotation)
+        //        stored.IsRevoked = true;
+        //        await _Context.SaveChangesAsync();
+
+        //        var roles = await _Context.UserRole
+        //            .Where(ur => ur.UserId == stored.UserId)
+        //            .Select(ur => ur.Role.RoleName)
+        //            .ToListAsync();
+
+        //        var newAccessToken = _tokenService.GenerateAccessToken(stored.User, roles);
+        //        var newRefreshToken = _tokenService.GenerateRefreshToken(stored.UserId);
+
+        //        _tokenService.SetAuthCookies(newAccessToken, newRefreshToken);
+
+        //        return Ok(new ApiResponse<string> { message = "Token refreshed", status = true });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new ApiResponse<string> { message = $"Something went wrong {ex.Message}", status = false });
+        //    }
+        //}
+
+
+
+
+
+
+
+
 
 
         [HttpPost("Logout")]
@@ -263,6 +320,45 @@ namespace Bigbasket_Ecommerce.Controllers
 
 
         }
+
+
+       // [HttpPost("Logout")]
+        //public async Task<IActionResult> Logout() 
+        //{
+        //    try
+        //    {
+        //        var refreshToken = Request.Cookies["refresh_token"];
+
+        //        if (!string.IsNullOrEmpty(refreshToken))
+        //        {
+        //            var stored = await _Context.RefreshTokens
+        //                .FirstOrDefaultAsync(r => r.RefreshUserToken == refreshToken);
+
+        //            if (stored != null)
+        //            {
+        //                stored.IsRevoked = true;
+        //                await _Context.SaveChangesAsync();
+        //            }
+        //        }
+
+        //        _tokenService.DeleteAuthCookies();
+
+        //        return Ok(new ApiResponse<string> { message = "Logout successfully", status = true });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new ApiResponse<string> { message = $"Logout failed: {ex.Message}", status = false });
+        //    }
+        //}
+
+
+
+
+
+
+
+
+
 
 
         [HttpPost("forgot-password")]
